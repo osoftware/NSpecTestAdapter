@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="NSpec.TestAdapter.VSIX..b8b5c223-2409-4345-9d62-0e4ceba87206" Version="1.0" Language="en-US" Publisher="{o} Software" />
+    <DisplayName>NSpec Test Adapter</DisplayName>
+    <Description xml:space="preserve">Run NSpec specifications from Test Explorer</Description>
+    <Icon>Rinnegan.ico</Icon>
+  </Metadata>
+  <Installation>
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0]" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="UnitTestExtension" d:Source="Project" d:ProjectName="NSpec.TestAdapter" Path="|NSpec.TestAdapter|" />
+  </Assets>
+</PackageManifest>
