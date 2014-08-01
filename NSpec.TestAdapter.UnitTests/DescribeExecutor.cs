@@ -12,6 +12,9 @@ namespace NSpec.TestAdapter.UnitTests
 	[TestClass]
 	public class DescribeExecutor
 	{
+		private const string NSpecTestsPath = @"..\..\..\SampleSpecs\bin\Debug\SampleSpecs.dll";
+		private const string MSTestTestsPath = @"..\..\..\NSpec.TestAdapter.UnitTests\bin\Debug\NSpec.TestAdapter.UnitTests.dll";
+
 		public class HandleMock : IFrameworkHandle
 		{
 			public readonly List<TestResult> results = new List<TestResult>();
@@ -58,10 +61,9 @@ namespace NSpec.TestAdapter.UnitTests
 		[TestMethod]
 		public void Executor_should_run_all_examples()
 		{
-
 			var handle = new HandleMock();
 			var target = new NSpecExecutor();
-			var specs = Path.GetFullPath(@"..\..\..\SampleSpecs\bin\Debug\SampleSpecs.dll");
+			var specs = Path.GetFullPath(NSpecTestsPath);
 
 			target.RunTests(new string[] { specs }, null, handle);
 
@@ -74,10 +76,9 @@ namespace NSpec.TestAdapter.UnitTests
 		[TestMethod]
 		public void Executor_should_run_selected_examples()
 		{
-
 			var handle = new HandleMock();
 			var target = new NSpecExecutor();
-			var specs = Path.GetFullPath(@"..\..\..\SampleSpecs\bin\Debug\SampleSpecs.dll");
+			var specs = Path.GetFullPath(NSpecTestsPath);
 			var testCases = new List<TestCase>
 			{
 				new TestCase("nspec. describe DeepThought. when examined. should know the answer.", NSpecExecutor.Uri, specs)
@@ -87,6 +88,18 @@ namespace NSpec.TestAdapter.UnitTests
 
 			Assert.AreEqual(2, handle.results.Count);
 			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Passed).Count());
+		}
+
+		[TestMethod]
+		public void Executor_should_do_nothing_with_non_nspec_tests()
+		{
+			var handle = new HandleMock();
+			var target = new NSpecExecutor();
+			var specs = Path.GetFullPath(MSTestTestsPath);
+
+			target.RunTests(new string[] { specs }, null, handle);
+
+			Assert.AreEqual(0, handle.results.Count);
 		}
 	}
 }

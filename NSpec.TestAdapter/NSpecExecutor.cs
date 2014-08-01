@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace NSpec.TestAdapter
 {
@@ -29,6 +30,8 @@ namespace NSpec.TestAdapter
 			{
 				using(var sandbox = new Sandbox<Executor>(source))
 				{
+					frameworkHandle.SendMessage(TestMessageLevel.Informational, "Running: " + source);
+
 					sandbox.Content.Execute(this);
 				}
 			}
@@ -40,6 +43,8 @@ namespace NSpec.TestAdapter
 
 			foreach (var group in tests.GroupBy(t => t.Source))
 			{
+				frameworkHandle.SendMessage(TestMessageLevel.Informational, "Running selected: " + group.Key);
+
 				using (var sandbox = new Sandbox<Executor>(group.Key))
 				{
 					sandbox.Content.Execute(this, group.Select(t => t.FullyQualifiedName).ToArray());
