@@ -37,10 +37,7 @@ namespace NSpec.TestAdapter
 				.Build()
 				.SelectMany(c => c.AllExamples())
 				.Where(example => examples.Contains(example.FullName()))
-				.ForEach(example =>
-					{
-						if (!example.HasRun) example.Context.Run(this, false);
-					});
+				.ForEach(example => example.Context.Run(this, false, example.Context.GetInstance()));
 		}
 
 		public void Write(Example example, int level)
