@@ -50,7 +50,7 @@ namespace NSpec.TestAdapter
 				? NSpecTestDiscoverer.Cache[example.FullName()] 
 				: example.ToTestCase(this.Source);
 			var result = example.Failed()
-				? new TestResultDTO { Outcome = TestOutcome.Failed, Category = example.Spec, Message = example.Exception.Message }
+				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = example.Exception.StackTrace, Message = example.Exception.Message }
 				: new TestResultDTO { Outcome = TestOutcome.Passed };
 			result.TestName = testCase.FullyQualifiedName;
 			result.Source = testCase.Source;

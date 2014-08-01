@@ -32,8 +32,8 @@ namespace NSpec.TestAdapter
 		{
 			var result = new TestResult(new TestCase(ev.TestName, NSpecExecutor.Uri, ev.Source));
 			result.Outcome = ev.Outcome;
-			result.Messages.Add(new TestResultMessage(ev.Category, ev.Message));
-
+			result.ErrorMessage = ev.Message;
+			result.ErrorStackTrace = ev.StackTrace;
 			return result;
 		}
 	}

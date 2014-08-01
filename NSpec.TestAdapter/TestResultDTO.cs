@@ -12,7 +12,7 @@ namespace NSpec.TestAdapter
 
 		public TestOutcome Outcome { get; set; }
 
-		public string Category { get; set; }
+		public string StackTrace { get; set; }
 
 		public string Message { get; set; }
 	}
