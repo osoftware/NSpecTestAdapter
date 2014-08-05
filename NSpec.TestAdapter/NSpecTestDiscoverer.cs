@@ -14,17 +14,8 @@ namespace NSpec.TestAdapter
 	[FileExtension(".exe")]
 	public class NSpecTestDiscoverer : ITestDiscoverer
 	{
-		public static Dictionary<string, TestCase> Cache { get; private set;}
-
-		static NSpecTestDiscoverer()
-		{
-			Cache = new Dictionary<string, TestCase>();
-		}
-
 		public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
 		{
-			Cache.Clear();
-
 			foreach (var source in sources)
 			{
 				using (var sandbox = new Sandbox<Discoverer>(source))
@@ -32,11 +23,7 @@ namespace NSpec.TestAdapter
 					sandbox.Content
 						.DiscoverTests()
 						.Select(name => name.ToTestCase(source))
-						.ForEach(tc =>
-							{
-								Cache.Add(tc.FullyQualifiedName, tc);
-								discoverySink.SendTestCase(tc);
-							});
+						.ForEach(discoverySink.SendTestCase);
 				}
 			}
 		}

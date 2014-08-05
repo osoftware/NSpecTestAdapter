@@ -18,6 +18,7 @@ namespace NSpec.TestAdapter.UnitTests
 		public class HandleMock : IFrameworkHandle
 		{
 			public readonly List<TestResult> results = new List<TestResult>();
+			public bool called;
 
 			public bool EnableShutdownAfterTestRun
 			{
@@ -47,6 +48,7 @@ namespace NSpec.TestAdapter.UnitTests
 			public void RecordResult(TestResult testResult)
 			{
 				this.results.Add(testResult);
+				this.called = true;
 			}
 
 			public void RecordStart(TestCase testCase)
@@ -88,18 +90,6 @@ namespace NSpec.TestAdapter.UnitTests
 
 			Assert.AreEqual(2, handle.results.Count);
 			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Passed).Count());
-		}
-
-		[TestMethod]
-		public void Executor_should_do_nothing_with_non_nspec_tests()
-		{
-			var handle = new HandleMock();
-			var target = new NSpecExecutor();
-			var specs = Path.GetFullPath(MSTestTestsPath);
-
-			target.RunTests(new string[] { specs }, null, handle);
-
-			Assert.AreEqual(0, handle.results.Count);
 		}
 	}
 }

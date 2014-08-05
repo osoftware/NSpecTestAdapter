@@ -9,8 +9,7 @@ namespace NSpec.TestAdapter
 	{
 		public static TestCase ToTestCase(this Example example, string source)
 		{
-			var name = example.FullName();
-			return NSpecTestDiscoverer.Cache.ContainsKey(name) ? NSpecTestDiscoverer.Cache[name] : name.ToTestCase(source);
+			return example.FullName().ToTestCase(source);
 		}
 
 		public static TestCase ToTestCase(this string example, string source)

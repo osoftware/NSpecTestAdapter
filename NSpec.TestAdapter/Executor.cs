@@ -42,10 +42,7 @@ namespace NSpec.TestAdapter
 
 		public void Write(Example example, int level)
 		{
-
-			var testCase = NSpecTestDiscoverer.Cache.ContainsKey(example.FullName()) 
-				? NSpecTestDiscoverer.Cache[example.FullName()] 
-				: example.ToTestCase(this.Source);
+			var testCase = example.ToTestCase(this.Source);
 			var result = example.Failed()
 				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = example.Exception.StackTrace, Message = example.Exception.Message }
 				: new TestResultDTO { Outcome = TestOutcome.Passed };
