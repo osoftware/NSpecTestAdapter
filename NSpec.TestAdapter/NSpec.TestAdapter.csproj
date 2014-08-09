@@ -56,8 +56,8 @@
     <Compile Include="NSpecTestDiscoverer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sandbox.cs" />
+    <Compile Include="TestCaseDTO.cs" />
     <Compile Include="TestResultDTO.cs" />
-    <Compile Include="TestResultFormatter.cs" />
     <Compile Include="DomainProxy.cs" />
   </ItemGroup>
   <ItemGroup>

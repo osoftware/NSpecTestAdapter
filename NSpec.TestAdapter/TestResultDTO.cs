@@ -15,5 +15,15 @@ namespace NSpec.TestAdapter
 		public string StackTrace { get; set; }
 
 		public string Message { get; set; }
+
+		public TestResult ToTestResult()
+		{
+			return new TestResult(new TestCase(this.TestName, NSpecExecutor.Uri, this.Source))
+			{
+				Outcome = this.Outcome,
+				ErrorMessage = this.Message,
+				ErrorStackTrace = this.StackTrace
+			};
+		}
 	}
 }

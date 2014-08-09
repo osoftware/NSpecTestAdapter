@@ -42,12 +42,11 @@ namespace NSpec.TestAdapter
 
 		public void Write(Example example, int level)
 		{
-			var testCase = example.ToTestCase(this.Source);
 			var result = example.Failed()
 				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = example.Exception.StackTrace, Message = example.Exception.Message }
 				: new TestResultDTO { Outcome = TestOutcome.Passed };
-			result.TestName = testCase.FullyQualifiedName;
-			result.Source = testCase.Source;
+			result.TestName = example.FullName();
+			result.Source = this.Source;
 
 			this.observer.Receive(result);
 		}
