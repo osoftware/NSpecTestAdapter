@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace NSpec.TestAdapter
@@ -15,7 +13,7 @@ namespace NSpec.TestAdapter
 
 		public int MinLineNumber { get; set; }
 
-		public int MaxLineNumber { get; set; }
+		public string[] Traits { get; set; }
 
 		public TestCase ToTestCase(string source)
 		{
@@ -23,6 +21,7 @@ namespace NSpec.TestAdapter
 			tc.DisplayName = tc.FullyQualifiedName.Remove(0, 7).Replace(Constants.InternalSeparator, Constants.VisualSeparator);
 			tc.CodeFilePath = this.FileName;
 			tc.LineNumber = this.MinLineNumber;
+			tc.Traits.AddRange(this.Traits.Select(t => new Trait(t.Replace("_", " "), null)));
 			return tc;
 		}
 	}

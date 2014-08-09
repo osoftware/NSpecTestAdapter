@@ -25,26 +25,24 @@ namespace NSpec.TestAdapter
 					Class = m.DeclaringType.Name,
 					Method = m.Name,
 					Location = dia.GetNavigationData(m.DeclaringType.FullName, m.Name)
-				})
-				.ToArray();
+				});
 
 			var examples = cb.Contexts()
 				.Build()
 				.AllContexts()
 				.SelectMany(context => context.Examples)
-				.Select(example => example.FullName())
-				.ToArray();
+				.Select(example => example);
 
 			var result = from m in methods
 						 from e in examples
 						 let name = (m.Class + ". " + m.Method).Replace("_", " ")
-						 where e.Contains(name)
+						 where e.FullName().Contains(name)
 						 select new TestCaseDTO
 						 {
-							 Name = e,
+							 Name = e.FullName(),
 							 FileName = m.Location.FileName,
 							 MinLineNumber = m.Location.MinLineNumber,
-							 MaxLineNumber = m.Location.MaxLineNumber
+							 Traits = e.Tags.ToArray()
 						 };
 
 			return result.ToArray();

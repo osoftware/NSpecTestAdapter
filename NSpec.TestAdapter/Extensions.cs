@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using NSpec.Domain;
 
 namespace NSpec.TestAdapter
 {

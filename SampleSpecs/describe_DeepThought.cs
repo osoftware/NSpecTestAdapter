@@ -6,6 +6,7 @@ namespace SampleSpecs
 	{
 		DeepThought dt = new DeepThought();
 
+		[Tag("One-should-fail One-should-pass")]
 		void when_examined()
 		{
 			it["should know the answer"] = () => dt.AnswerQuestion().should_be(42);
@@ -18,8 +19,10 @@ namespace SampleSpecs
 		}
 	}
 
+	[Tag("Derived")]
 	class describe_Earth : describe_DeepThought
 	{
+		[Tag("Should_be_skipped")]
 		void when_asked_for_question()
 		{
 			it["should have the answer"] = todo;
