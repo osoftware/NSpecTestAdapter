@@ -17,4 +17,12 @@ namespace SampleSpecs
 			it["should build the Earth"] = () => dt.BuildComputerForFindingQuestion().should_be("Earth");
 		}
 	}
+
+	class describe_Earth : describe_DeepThought
+	{
+		void when_asked_for_question()
+		{
+			it["should have the answer"] = todo;
+		}
+	}
 }

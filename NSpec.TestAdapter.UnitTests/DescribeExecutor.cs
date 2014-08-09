@@ -69,8 +69,9 @@ namespace NSpec.TestAdapter.UnitTests
 
 			target.RunTests(new string[] { specs }, null, handle);
 
-			Assert.AreEqual(3, handle.results.Count);
+			Assert.AreEqual(4, handle.results.Count);
 			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Failed).Count());
+			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Skipped).Count());
 			Assert.AreEqual(2, handle.results.Where(r => r.Outcome == TestOutcome.Passed).Count());
 		}
 

@@ -44,7 +44,7 @@ namespace NSpec.TestAdapter
 		{
 			var result = example.Failed()
 				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = example.Exception.StackTrace, Message = example.Exception.Message }
-				: new TestResultDTO { Outcome = TestOutcome.Passed };
+				: new TestResultDTO { Outcome = example.Pending ? TestOutcome.Skipped : TestOutcome.Passed };
 			result.TestName = example.FullName();
 			result.Source = this.Source;
 
