@@ -1,7 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NSpec.Domain;
-using NSpec.Domain.Extensions;
 
 namespace NSpec.TestAdapter
 {
@@ -17,35 +18,39 @@ namespace NSpec.TestAdapter
 			var cb = new ContextBuilder(finder, new Tags());
 			var dia = new DiaSession(SandboxedAssembly.Location);
 
-			var methods = finder.SpecClasses()
-				.SelectMany(t => t.Methods())
-				.Where(m => conv.IsMethodLevelContext(m.Name) || conv.IsMethodLevelExample(m.Name))
-				.Select(m => new
-				{
-					Class = m.DeclaringType.Name,
-					Method = m.Name,
-					Location = dia.GetNavigationData(m.DeclaringType.FullName, m.Name)
-				});
-
 			var examples = cb.Contexts()
 				.Build()
 				.AllContexts()
-				.SelectMany(context => context.Examples)
-				.Select(example => example);
+				.SelectMany(context => context.Examples);
 
-			var result = from m in methods
-						 from e in examples
-						 let name = (m.Class + ". " + m.Method).Replace("_", " ")
-						 where e.FullName().Contains(name)
+			var result = from example in examples
+						 let method = GetAction(example)
+						 let location = dia.GetNavigationData(method.DeclaringType.FullName, method.Name)
+							?? new DiaNavigationData(null, 0, 0)
 						 select new TestCaseDTO
 						 {
-							 Name = e.FullName(),
-							 FileName = m.Location.FileName,
-							 MinLineNumber = m.Location.MinLineNumber,
-							 Traits = e.Tags.ToArray()
+							 Name = example.FullName(),
+							 FileName = location.FileName,
+							 LineNumber = location.MinLineNumber,
+							 Traits = example.Tags.ToArray()
 						 };
 
 			return result.ToArray();
+		}
+
+		public MethodInfo GetAction(Example example)
+		{
+			if (example is MethodExample)
+			{
+				return example.GetType()
+					.GetField("method", BindingFlags.Instance | BindingFlags.NonPublic)
+					.GetValue(example) as MethodInfo;
+			}
+
+			var action = example.GetType()
+				.GetField("action", BindingFlags.Instance | BindingFlags.NonPublic)
+				.GetValue(example) as Action;
+			return action.Method;
 		}
 	}
 }

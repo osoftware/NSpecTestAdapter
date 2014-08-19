@@ -11,7 +11,7 @@ namespace NSpec.TestAdapter
 
 		public string FileName { get; set; }
 
-		public int MinLineNumber { get; set; }
+		public int LineNumber { get; set; }
 
 		public string[] Traits { get; set; }
 
@@ -20,7 +20,7 @@ namespace NSpec.TestAdapter
 			var tc = new TestCase(this.Name, NSpecExecutor.Uri, source);
 			tc.DisplayName = tc.FullyQualifiedName.Remove(0, 7).Replace(Constants.InternalSeparator, Constants.VisualSeparator);
 			tc.CodeFilePath = this.FileName;
-			tc.LineNumber = this.MinLineNumber;
+			tc.LineNumber = this.LineNumber;
 			tc.Traits.AddRange(this.Traits.Select(t => new Trait(t.Replace("_", " "), null)));
 			return tc;
 		}
