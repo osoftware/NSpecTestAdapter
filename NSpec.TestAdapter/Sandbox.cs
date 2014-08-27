@@ -20,14 +20,15 @@ namespace NSpec.TestAdapter
 		public Sandbox(string assemblyPath)
 		{
 			var assemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(assemblyPath));
-			var solutionDirectory = assemblyDirectory.Parent.Parent.Parent.FullName;
+			var projectDirectory = assemblyDirectory.Parent.Parent;
+			var solutionDirectory = projectDirectory.Parent.FullName;
 			var setup = new AppDomainSetup
 			{
 				ShadowCopyFiles = "true",
 				LoaderOptimization = LoaderOptimization.MultiDomain,
 				ApplicationBase = solutionDirectory,
 				PrivateBinPath = string.Join(";",
-					FindNSpec(assemblyDirectory.FullName),
+					FindNSpec(projectDirectory),
 					assemblyDirectory.FullName.Remove(0, solutionDirectory.Length + 1))
 			};
 			this.domain = AppDomain.CreateDomain("tests-sandbox", null, setup);
@@ -48,13 +49,12 @@ namespace NSpec.TestAdapter
 			AppDomain.Unload(domain);
 		}
 
-		private string FindNSpec(string assemblyDirectory)
+		private string FindNSpec(DirectoryInfo projectDirectory)
 		{
-			Directory.SetCurrentDirectory(assemblyDirectory);
+			var packagesFile = Path.Combine(projectDirectory.FullName, "packages.config");
+			if (!File.Exists(packagesFile)) return null;
 
-			if (!File.Exists(@"..\..\packages.config")) return null;
-
-			var doc = XDocument.Load(@"..\..\packages.config");
+			var doc = XDocument.Load(packagesFile);
 			var nspecVersion = doc.Descendants("package")
 				.Where(p => p.Attribute("id").Value == "nspec")
 				.Select(p => p.Attribute("version").Value)
@@ -62,7 +62,7 @@ namespace NSpec.TestAdapter
 
 			if (nspecVersion == null) return null;
 
-			return string.Format(@"packages\nspec.{0}\tools", nspecVersion);
+			return string.Format(@"packages\nspec.{0}\tools;{1}\packages\nspec.{0}\tools", nspecVersion, projectDirectory.Name);
 		}
 	}
 }
