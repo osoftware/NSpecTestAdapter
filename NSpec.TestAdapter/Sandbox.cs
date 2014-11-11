@@ -21,7 +21,7 @@ namespace NSpec.TestAdapter
 		{
 			var assemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(assemblyPath));
 			var projectDirectory = assemblyDirectory.Parent.Parent;
-			var solutionDirectory = projectDirectory.Parent.FullName;
+			var solutionDirectory = FindSolutionDirectory(projectDirectory);
 			var setup = new AppDomainSetup
 			{
 				ShadowCopyFiles = "true",
@@ -47,6 +47,13 @@ namespace NSpec.TestAdapter
 		{
 			this.Content = null;
 			AppDomain.Unload(domain);
+		}
+
+		private string FindSolutionDirectory(DirectoryInfo projectDirectory)
+		{
+			return projectDirectory.EnumerateDirectories("packages").Any()
+				? projectDirectory.FullName
+				: FindSolutionDirectory(projectDirectory.Parent);
 		}
 
 		private string FindNSpec(DirectoryInfo projectDirectory)
