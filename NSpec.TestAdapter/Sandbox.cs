@@ -22,11 +22,14 @@ namespace NSpec.TestAdapter
 			var assemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(assemblyPath));
 			var projectDirectory = assemblyDirectory.Parent.Parent;
 			var solutionDirectory = FindSolutionDirectory(projectDirectory);
+			// Import the <assembly>.dll.app.config into the app domain
+			var appConfigFile = assemblyPath + ".config";
 			var setup = new AppDomainSetup
 			{
 				ShadowCopyFiles = "true",
 				LoaderOptimization = LoaderOptimization.MultiDomain,
 				ApplicationBase = solutionDirectory,
+				ConfigurationFile = System.IO.File.Exists(appConfigFile) ? appConfigFile : null,
 				PrivateBinPath = string.Join(";",
 					FindNSpec(projectDirectory),
 					assemblyDirectory.FullName.Remove(0, solutionDirectory.Length + 1))
