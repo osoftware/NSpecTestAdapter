@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
@@ -20,10 +22,12 @@ namespace NSpec.TestAdapter
 			{
 				using (var sandbox = new Sandbox<Discoverer>(source))
 				{
-					sandbox.Content
-						.DiscoverTests()
-						.Select(name => name.ToTestCase(source))
-						.ForEach(discoverySink.SendTestCase);
+					//System.Windows.Forms.MessageBox.Show("DEBUG: " + sandbox.IsValidTestProject);
+					if (sandbox.IsValidTestProject)
+						sandbox.Content
+							.DiscoverTests()
+							.Select(name => name.ToTestCase(source))
+							.ForEach(discoverySink.SendTestCase);
 				}
 			}
 		}

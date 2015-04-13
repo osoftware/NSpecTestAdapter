@@ -21,46 +21,68 @@ namespace NSpec.TestAdapter
 		{
 			var assemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(assemblyPath));
 			var projectDirectory = assemblyDirectory.Parent.Parent;
-			var solutionDirectory = FindSolutionDirectory(projectDirectory);
+
+			var solutionDirectory = FindPackagesDirectory(projectDirectory);
+
+			// Can only continue if valid test project
+			if (!string.IsNullOrEmpty(solutionDirectory))
+				IsValidTestProject = true;
+			else
+				return;
+
+			//throw new DirectoryNotFoundException("Failed attempting to find 'packages' folder in any parent directories.");
+
+			var nSpecPath = FindNSpec(projectDirectory);
+			var privateBinPath = string.Join(";",
+				nSpecPath,
+				assemblyDirectory.FullName.Remove(0, solutionDirectory.Length + 1));
+
 			var setup = new AppDomainSetup
 			{
 				ShadowCopyFiles = "true",
 				LoaderOptimization = LoaderOptimization.MultiDomain,
 				ApplicationBase = solutionDirectory,
-				PrivateBinPath = string.Join(";",
-					FindNSpec(projectDirectory),
-					assemblyDirectory.FullName.Remove(0, solutionDirectory.Length + 1))
+				PrivateBinPath = privateBinPath
 			};
+			
 			this.domain = AppDomain.CreateDomain("tests-sandbox", null, setup);
-
+			
 			var type = typeof(T);
 			this.Content = this.domain.CreateInstanceFromAndUnwrap(type.Assembly.Location, type.FullName) as T;
 			this.Content.Load(assemblyPath);
 		}
 
+		
 		/// <summary>
 		/// A sandboxed object.
 		/// </summary>
 		public T Content { get; private set; }
 
+		public bool IsValidTestProject { get; set; }
+
 		public void Dispose()
 		{
 			this.Content = null;
-			AppDomain.Unload(domain);
+			if (domain != null)
+				AppDomain.Unload(domain);
 		}
 
-		private string FindSolutionDirectory(DirectoryInfo projectDirectory)
+		private string FindPackagesDirectory(DirectoryInfo projectDirectory)
 		{
-			return projectDirectory.EnumerateDirectories("packages").Any()
+			if (projectDirectory == null) return null;
+			//System.Windows.Forms.MessageBox.Show("DEBUG: " + projectDirectory.FullName);
+			var anyDirectories = projectDirectory.EnumerateDirectories("packages").Any();
+			//System.Windows.Forms.MessageBox.Show("DEBUG: Package dir exists? " + anyDirectories);
+			return anyDirectories
 				? projectDirectory.FullName
-				: FindSolutionDirectory(projectDirectory.Parent);
+				: FindPackagesDirectory(projectDirectory.Parent);
 		}
 
 		private string FindNSpec(DirectoryInfo projectDirectory)
 		{
 			var packagesFile = Path.Combine(projectDirectory.FullName, "packages.config");
 			if (!File.Exists(packagesFile)) return null;
-
+			
 			var doc = XDocument.Load(packagesFile);
 			var nspecVersion = doc.Descendants("package")
 				.Where(p => p.Attribute("id").Value == "nspec")
