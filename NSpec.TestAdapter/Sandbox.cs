@@ -25,12 +25,7 @@ namespace NSpec.TestAdapter
 			var solutionDirectory = FindPackagesDirectory(projectDirectory);
 
 			// Can only continue if valid test project
-			if (!string.IsNullOrEmpty(solutionDirectory))
-				IsValidTestProject = true;
-			else
-				return;
-
-			//throw new DirectoryNotFoundException("Failed attempting to find 'packages' folder in any parent directories.");
+			if (string.IsNullOrEmpty(solutionDirectory)) return;
 
 			var nSpecPath = FindNSpec(projectDirectory);
 			var privateBinPath = string.Join(";",
@@ -58,21 +53,16 @@ namespace NSpec.TestAdapter
 		/// </summary>
 		public T Content { get; private set; }
 
-		public bool IsValidTestProject { get; set; }
-
 		public void Dispose()
 		{
 			this.Content = null;
-			if (domain != null)
-				AppDomain.Unload(domain);
+			if (domain != null) AppDomain.Unload(domain);
 		}
 
 		private string FindPackagesDirectory(DirectoryInfo projectDirectory)
 		{
 			if (projectDirectory == null) return null;
-			//System.Windows.Forms.MessageBox.Show("DEBUG: " + projectDirectory.FullName);
 			var anyDirectories = projectDirectory.EnumerateDirectories("packages").Any();
-			//System.Windows.Forms.MessageBox.Show("DEBUG: Package dir exists? " + anyDirectories);
 			return anyDirectories
 				? projectDirectory.FullName
 				: FindPackagesDirectory(projectDirectory.Parent);
