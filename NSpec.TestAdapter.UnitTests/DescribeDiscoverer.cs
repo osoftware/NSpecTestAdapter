@@ -32,7 +32,7 @@ namespace NSpec.TestAdapter.UnitTests
 
 			target.DiscoverTests(new string[] { specs }, null, null, sink);
 
-			Assert.AreEqual(4, sink.TestCases.Count);
+			Assert.AreEqual(7, sink.TestCases.Count);
 		}
 
 		[TestMethod]
