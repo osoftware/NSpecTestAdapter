@@ -69,10 +69,10 @@ namespace NSpec.TestAdapter.UnitTests
 
 			target.RunTests(new string[] { specs }, null, handle);
 
-			Assert.AreEqual(4, handle.results.Count);
+			Assert.AreEqual(7, handle.results.Count);
 			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Failed).Count());
 			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Skipped).Count());
-			Assert.AreEqual(2, handle.results.Where(r => r.Outcome == TestOutcome.Passed).Count());
+			Assert.AreEqual(5, handle.results.Where(r => r.Outcome == TestOutcome.Passed).Count());
 		}
 
 
@@ -89,8 +89,28 @@ namespace NSpec.TestAdapter.UnitTests
 
 			target.RunTests(testCases, null, handle);
 
-			Assert.AreEqual(2, handle.results.Count);
+			Assert.AreEqual(1, handle.results.Count);
 			Assert.AreEqual(1, handle.results.Where(r => r.Outcome == TestOutcome.Passed).Count());
 		}
+
+        [TestMethod]
+        public void Executor_should_run_selected_example_taking_into_consideration_before_all()
+        {
+            var handle = new HandleMock();
+            var target = new NSpecExecutor();
+            var specs = Path.GetFullPath(NSpecTestsPath);
+            var testCases = new List<TestCase>
+			{
+				new TestCase("nspec. describe nested before all. method context. lambda context. should output ABCD.", NSpecExecutor.Uri, specs)
+			};
+
+            target.RunTests(testCases, null, handle);
+
+            Assert.AreEqual(1, handle.results.Count);
+            Assert.AreEqual(1, handle.results.Where(r =>
+            {
+                return r.Outcome == TestOutcome.Passed;
+            }).Count());
+        }
 	}
 }

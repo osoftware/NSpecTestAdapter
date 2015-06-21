@@ -25,23 +25,53 @@ namespace NSpec.TestAdapter
 				.Build()
 				.ForEach(context => context.Run(this, false));
 		}
+
 		public void Execute(IReceiveTestResult observer, string[] testNames)
 		{
 			this.observer = observer;
 
-			var examples = new HashSet<string>(testNames);
+			var selectedExamples = new HashSet<string>(testNames);
 
 			var finder = new SpecFinder(SandboxedAssembly.GetTypes(), "");
-			var cb = new ContextBuilder(finder, new Tags());
+			var cb = new ContextBuilder(finder, new Tags());    
 
-			cb.Contexts()
-				.Build()
-				.SelectMany(c => c.AllExamples())
-				.Where(example => examples.Contains(example.FullName()))
-				.ForEach(example => example.Context.Run(this, false, example.Context.GetInstance()));
+		    ContextCollection contextCollection = cb.Contexts().Build();
+
+            FilterOutNonSelectedExamples(contextCollection, selectedExamples);
+
+            contextCollection.ForEach(context =>
+            {
+                context.Run(this, false);
+            });
 		}
 
-		public void Write(Example example, int level)
+	    private static void FilterOutNonSelectedExamples(List<Context> contextCollection, HashSet<string> selectedExamples)
+	    {
+	        contextCollection.ForEach(context =>
+	        {
+                var contextSelectedExamples = context.Examples.Where(ce => selectedExamples.Contains(ce.FullName()));
+
+                if (contextSelectedExamples.Any())
+	            {
+                    context.Examples = contextSelectedExamples.ToList();
+                }
+                else
+                {
+                    context.Examples.Clear();                    
+                }
+
+	            if (context.Contexts == null) return;
+
+	            IEnumerable<Context> innerContextWithExamples = context.Contexts.Where(x => x.AllExamples().Any());
+	            if (innerContextWithExamples.Any())
+	            {
+	                FilterOutNonSelectedExamples(innerContextWithExamples.ToList(), selectedExamples);
+	            }
+	        });
+
+	    }
+
+	    public void Write(Example example, int level)
 		{
 	        var result = example.Failed()
 				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = GetStackTrace(example.Exception), Message = example.Exception.Message }
