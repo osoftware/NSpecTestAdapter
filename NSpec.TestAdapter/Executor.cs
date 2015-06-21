@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using NSpec.Domain;
@@ -42,8 +43,8 @@ namespace NSpec.TestAdapter
 
 		public void Write(Example example, int level)
 		{
-			var result = example.Failed()
-				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = example.Exception.StackTrace, Message = example.Exception.Message }
+	        var result = example.Failed()
+				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = GetStackTrace(example.Exception), Message = example.Exception.Message }
 				: new TestResultDTO { Outcome = example.Pending ? TestOutcome.Skipped : TestOutcome.Passed };
 			result.TestName = example.FullName();
 			result.Source = this.Source;
@@ -51,7 +52,23 @@ namespace NSpec.TestAdapter
 			this.observer.Receive(result);
 		}
 
-		public void Write(Context context)
+        private string GetStackTrace(Exception exception)
+        {
+            while (exception != null)
+            {
+                var stackTrace = exception.StackTrace;
+                if (! string.IsNullOrEmpty(stackTrace))
+                {
+                    return stackTrace;
+                }
+
+                exception = exception.InnerException;
+            }
+
+            return null;
+        }
+
+	    public void Write(Context context)
 		{
 		}
 	}
