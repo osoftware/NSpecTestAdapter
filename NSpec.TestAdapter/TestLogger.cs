@@ -38,7 +38,7 @@ namespace NSpec.TestAdapter
         public void SendDebugMessage(string message)
         {
 #if DEBUG
-            SendMessage(TestMessageLevel.Informational, String.Format("Debug: {0}", message));
+            SendMessage(TestMessageLevel.Informational, String.Format("[DBG] {0}", message));
 #endif
         }
 
