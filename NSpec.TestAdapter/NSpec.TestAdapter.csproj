@@ -57,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sandbox.cs" />
     <Compile Include="TestCaseDTO.cs" />
+    <Compile Include="TestLogger.cs" />
     <Compile Include="TestResultDTO.cs" />
     <Compile Include="DomainProxy.cs" />
   </ItemGroup>
