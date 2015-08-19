@@ -12,16 +12,16 @@ namespace NSpec.TestAdapter
     {
         public TestLogger(IMessageLogger messageLogger)
         {
-            _messageLogger = messageLogger;
+            this.messageLogger = messageLogger;
 
-            _adapterVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            adapterVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
         public void SendMessage(TestMessageLevel logLevel, string message)
         {
             if (CanLog)
             {
-                _messageLogger.SendMessage(logLevel, message);
+                messageLogger.SendMessage(logLevel, message);
             }
         }
 
@@ -32,7 +32,7 @@ namespace NSpec.TestAdapter
 
         public void SendMainMessage(string message)
         {
-            SendInformationalMessage(String.Format("{0} {1}: {2}", _adapterName, _adapterVersion, message));
+            SendInformationalMessage(String.Format("{0} {1}: {2}", adapterName, adapterVersion, message));
         }
 
         public void SendDebugMessage(string message)
@@ -66,11 +66,11 @@ namespace NSpec.TestAdapter
             SendErrorMessage(ex.ToString());
         }
 
-        private bool CanLog { get { return _messageLogger != null; } }
+        bool CanLog { get { return messageLogger != null; } }
 
-        private readonly IMessageLogger _messageLogger;
-        private readonly string _adapterVersion;
+        readonly IMessageLogger messageLogger;
+        readonly string adapterVersion;
 
-        private const string _adapterName = "NSpec Test Adapter";
+        const string adapterName = "NSpec Test Adapter";
     }
 }
