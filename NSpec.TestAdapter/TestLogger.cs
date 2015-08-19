@@ -37,9 +37,10 @@ namespace NSpec.TestAdapter
 
         public void SendDebugMessage(string message)
         {
-#if DEBUG
-            SendMessage(TestMessageLevel.Informational, String.Format("[DBG] {0}", message));
-#endif
+            if (isDevBuild)
+            {
+                SendMessage(TestMessageLevel.Informational, String.Format("[DBG] {0}", message));
+            }
         }
 
         public void SendWarningMessage(string message)
@@ -49,9 +50,15 @@ namespace NSpec.TestAdapter
 
         public void SendWarningMessage(Exception ex, string message)
         {
-            SendWarningMessage(message);
-
-            SendWarningMessage(ex.ToString());
+            if (isDevBuild)
+            {
+                SendWarningMessage(message);
+                SendWarningMessage(ex.ToString());
+            }
+            else
+            {
+                SendWarningMessage(String.Format("Exception {0}, {1}", ex.GetType(), message));
+            }
         }
 
         public void SendErrorMessage(string message)
@@ -61,9 +68,15 @@ namespace NSpec.TestAdapter
 
         public void SendErrorMessage(Exception ex, string message)
         {
-            SendErrorMessage(message);
-
-            SendErrorMessage(ex.ToString());
+            if (isDevBuild)
+            {
+                SendErrorMessage(message);
+                SendErrorMessage(ex.ToString());
+            }
+            else
+            {
+                SendErrorMessage(String.Format("Exception {0}, {1}", ex.GetType(), message));
+            }
         }
 
         bool CanLog { get { return messageLogger != null; } }
@@ -72,5 +85,12 @@ namespace NSpec.TestAdapter
         readonly string adapterVersion;
 
         const string adapterName = "NSpec Test Adapter";
+
+        readonly bool isDevBuild = 
+#if DEBUG
+            true;
+#else
+            false;
+#endif
     }
 }
