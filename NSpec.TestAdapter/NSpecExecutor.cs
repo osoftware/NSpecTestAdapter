@@ -36,9 +36,16 @@ namespace NSpec.TestAdapter
 				{
 					using (var sandbox = new Sandbox<Executor>(source))
 					{
-						testLogger.SendInformationalMessage(String.Format("Running: '{0}'", source));
+						if (sandbox != null)
+						{
+							testLogger.SendInformationalMessage(String.Format("Running: '{0}'", source));
 
-						sandbox.Content.Execute(this);
+							sandbox.Content.Execute(this);
+						}
+						else
+						{
+							testLogger.SendWarningMessage(String.Format("Problems loading sandbox for source '{0}'", source));
+						}
 					}
 				}
 				catch (Exception ex)
@@ -62,13 +69,22 @@ namespace NSpec.TestAdapter
 
 			foreach (var group in tests.GroupBy(t => t.Source))
 			{
-				testLogger.SendInformationalMessage(String.Format("Running selected: '{0}'", group.Key));
+				string source = group.Key;
+
+				testLogger.SendInformationalMessage(String.Format("Running selected: '{0}'", source));
 
 				try
 				{
-					using (var sandbox = new Sandbox<Executor>(group.Key))
+					using (var sandbox = new Sandbox<Executor>(source))
 					{
-						sandbox.Content.Execute(this, group.Select(t => t.FullyQualifiedName).ToArray());
+						if (sandbox != null)
+						{
+							sandbox.Content.Execute(this, group.Select(t => t.FullyQualifiedName).ToArray());
+						}
+						else
+						{
+							testLogger.SendWarningMessage(String.Format("Problems loading sandbox for source '{0}'", source));
+						}
 					}
 				}
 				catch (Exception ex)

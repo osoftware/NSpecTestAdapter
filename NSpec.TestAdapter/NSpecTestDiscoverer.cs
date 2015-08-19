@@ -31,10 +31,18 @@ namespace NSpec.TestAdapter
 					{
 						if (sandbox.Content != null)
 						{
-							sandbox.Content
+							var testCases = sandbox.Content
 								.DiscoverTests()
-								.Select(name => name.ToTestCase(source))
+								.Select(name => name.ToTestCase(source));
+
+							testCases
 								.ForEach(discoverySink.SendTestCase);
+
+							testLogger.SendDebugMessage(String.Format("Found {0} test cases", testCases.Count()));
+						}
+						else
+						{
+							testLogger.SendWarningMessage(String.Format("Problems loading sandbox for source '{0}'", source));
 						}
 					}
 				}
