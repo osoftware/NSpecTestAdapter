@@ -16,7 +16,7 @@ namespace NSpec.TestAdapter
 		public const string UriString = "executor://NSpecExecutor";
 		public static readonly Uri Uri = new Uri(UriString);
 		private IFrameworkHandle frameworkHandle;
-
+		
 		public void Cancel()
 		{
 			throw new NotImplementedException();
@@ -26,30 +26,60 @@ namespace NSpec.TestAdapter
 		{
 			this.frameworkHandle = frameworkHandle;
 
+			var testLogger = new TestLogger(frameworkHandle);
+
+			testLogger.SendMainMessage("Execution started");
+
 			foreach (var source in sources)
 			{
-				using(var sandbox = new Sandbox<Executor>(source))
+				try
 				{
-					frameworkHandle.SendMessage(TestMessageLevel.Informational, "Running: " + source);
+					using (var sandbox = new Sandbox<Executor>(source))
+					{
+						testLogger.SendInformationalMessage(String.Format("Running: '{0}'", source));
 
-					sandbox.Content.Execute(this);
+						sandbox.Content.Execute(this);
+					}
+				}
+				catch (Exception ex)
+				{
+					testLogger.SendErrorMessage(ex, String.Format("Exception found while executing tests in source '{0}'", source));
+
+					// just go on with the next
 				}
 			}
+
+			testLogger.SendMainMessage("Execution finished");
 		}
 
 		public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
 		{
 			this.frameworkHandle = frameworkHandle;
 
+			var testLogger = new TestLogger(frameworkHandle);
+
+			testLogger.SendMainMessage("Execution started");
+
 			foreach (var group in tests.GroupBy(t => t.Source))
 			{
-				frameworkHandle.SendMessage(TestMessageLevel.Informational, "Running selected: " + group.Key);
+				testLogger.SendInformationalMessage(String.Format("Running selected: '{0}'", group.Key));
 
-				using (var sandbox = new Sandbox<Executor>(group.Key))
+				try
 				{
-					sandbox.Content.Execute(this, group.Select(t => t.FullyQualifiedName).ToArray());
+					using (var sandbox = new Sandbox<Executor>(group.Key))
+					{
+						sandbox.Content.Execute(this, group.Select(t => t.FullyQualifiedName).ToArray());
+					}
+				}
+				catch (Exception ex)
+				{
+					testLogger.SendErrorMessage(ex, String.Format("Exception found while executing tests in group '{0}'", group.Key));
+
+					// just go on with the next
 				}
 			}
+
+			testLogger.SendMainMessage("Execution finished");
 		}
 
 		public void Receive(TestResultDTO result)

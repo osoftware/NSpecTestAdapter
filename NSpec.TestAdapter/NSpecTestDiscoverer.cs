@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using System;
 
 namespace NSpec.TestAdapter
 {
@@ -16,19 +17,38 @@ namespace NSpec.TestAdapter
 	{
 		public void DiscoverTests(IEnumerable<string> sources, IDiscoveryContext discoveryContext, IMessageLogger logger, ITestCaseDiscoverySink discoverySink)
 		{
+			testLogger = new TestLogger(logger);
+
+			testLogger.SendMainMessage("Discovery started");
+
 			foreach (var source in sources)
 			{
-				using (var sandbox = new Sandbox<Discoverer>(source))
+				testLogger.SendDebugMessage(String.Format("Processing: '{0}'", source));
+
+				try
 				{
-					if (sandbox.Content != null)
+					using (var sandbox = new Sandbox<Discoverer>(source))
 					{
-						sandbox.Content
-							.DiscoverTests()
-							.Select(name => name.ToTestCase(source))
-							.ForEach(discoverySink.SendTestCase);
+						if (sandbox.Content != null)
+						{
+							sandbox.Content
+								.DiscoverTests()
+								.Select(name => name.ToTestCase(source))
+								.ForEach(discoverySink.SendTestCase);
+						}
 					}
 				}
+				catch (Exception ex)
+				{
+					testLogger.SendErrorMessage(ex, String.Format("Exception found while discovering tests in source '{0}'", source));
+
+					// just go on with the next
+				}
 			}
+
+			testLogger.SendMainMessage("Discovery finished");
 		}
+
+		private TestLogger testLogger;
 	}
 }
