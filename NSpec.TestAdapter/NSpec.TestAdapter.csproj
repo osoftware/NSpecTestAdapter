@@ -35,8 +35,9 @@
     <Reference Include="Microsoft.VisualStudio.TestPlatform.ObjectModel">
       <HintPath>$(ProgramFiles)\Microsoft Visual Studio 12.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
     </Reference>
-    <Reference Include="NSpec">
-      <HintPath>..\packages\nspec.0.9.68\lib\NSpec.dll</HintPath>
+    <Reference Include="NSpec, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\nspec.1.0.1\lib\NSpec.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

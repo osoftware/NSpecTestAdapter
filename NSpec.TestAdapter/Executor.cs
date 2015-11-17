@@ -40,7 +40,7 @@ namespace NSpec.TestAdapter
 				.ForEach(example => example.Context.Run(this, false, example.Context.GetInstance()));
 		}
 
-		public void Write(Example example, int level)
+		public void Write(ExampleBase example, int level)
 		{
 			var result = example.Failed()
 				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = example.Exception.StackTrace, Message = example.Exception.Message }
