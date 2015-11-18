@@ -38,7 +38,7 @@ namespace NSpec.TestAdapter
 			return result.ToArray();
 		}
 
-		public MethodInfo GetAction(Example example)
+		public MethodInfo GetAction(ExampleBase example)
 		{
 			if (example is MethodExample)
 			{
