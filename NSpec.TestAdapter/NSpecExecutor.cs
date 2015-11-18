@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using System.IO;
 
 namespace NSpec.TestAdapter
 {
@@ -38,7 +39,9 @@ namespace NSpec.TestAdapter
 					{
 						testLogger.SendInformationalMessage(String.Format("Running: '{0}'", source));
 
-						sandbox.Content.Execute(this);
+						var assemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(source));
+						Directory.SetCurrentDirectory(assemblyDirectory.FullName);
+                        sandbox.Content.Execute(this);
 					}
 				}
 				catch (Exception ex)
@@ -68,6 +71,8 @@ namespace NSpec.TestAdapter
 				{
 					using (var sandbox = new Sandbox<Executor>(group.Key))
 					{
+						var assemblyDirectory = new DirectoryInfo(Path.GetDirectoryName(group.Key));
+						Directory.SetCurrentDirectory(assemblyDirectory.FullName);
 						sandbox.Content.Execute(this, group.Select(t => t.FullyQualifiedName).ToArray());
 					}
 				}
