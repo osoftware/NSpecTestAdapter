@@ -51,6 +51,7 @@
     <Compile Include="DebuggerShim.cs" />
     <Compile Include="DeepThought.cs" />
     <Compile Include="describe_DeepThought.cs" />
+    <Compile Include="describe_nested.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
