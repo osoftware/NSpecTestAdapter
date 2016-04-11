@@ -35,45 +35,44 @@ namespace NSpec.TestAdapter
 			var finder = new SpecFinder(SandboxedAssembly.GetTypes(), "");
 			var cb = new ContextBuilder(finder, new Tags());    
 
-		    ContextCollection contextCollection = cb.Contexts().Build();
+			ContextCollection contextCollection = cb.Contexts().Build();
 
-            FilterOutNonSelectedExamples(contextCollection, selectedExamples);
+			FilterOutNonSelectedExamples(contextCollection, selectedExamples);
 
-            contextCollection.ForEach(context =>
-            {
-                context.Run(this, false);
-            });
+			contextCollection.ForEach(context =>
+			{
+				context.Run(this, false);
+			});
 		}
 
-	    private static void FilterOutNonSelectedExamples(List<Context> contextCollection, HashSet<string> selectedExamples)
-	    {
-	        contextCollection.ForEach(context =>
-	        {
-                var contextSelectedExamples = context.Examples.Where(ce => selectedExamples.Contains(ce.FullName()));
+		private static void FilterOutNonSelectedExamples(List<Context> contextCollection, HashSet<string> selectedExamples)
+		{
+			contextCollection.ForEach(context =>
+			{
+				var contextSelectedExamples = context.Examples.Where(ce => selectedExamples.Contains(ce.FullName()));
 
-                if (contextSelectedExamples.Any())
-	            {
-                    context.Examples = contextSelectedExamples.ToList();
-                }
-                else
-                {
-                    context.Examples.Clear();                    
-                }
+				if(contextSelectedExamples.Any())
+				{
+					context.Examples = contextSelectedExamples.ToList();
+				}
+				else
+				{
+					context.Examples.Clear();                    
+				}
 
-	            if (context.Contexts == null) return;
+				if (context.Contexts == null) return;
 
-	            IEnumerable<Context> innerContextWithExamples = context.Contexts.Where(x => x.AllExamples().Any());
-	            if (innerContextWithExamples.Any())
-	            {
-	                FilterOutNonSelectedExamples(innerContextWithExamples.ToList(), selectedExamples);
-	            }
-	        });
-
+				IEnumerable<Context> innerContextWithExamples = context.Contexts.Where(x => x.AllExamples().Any());
+				if (innerContextWithExamples.Any())
+				{
+					FilterOutNonSelectedExamples(innerContextWithExamples.ToList(), selectedExamples);
+				}
+			});
 	    }
 
 	    public void Write(Example example, int level)
 		{
-	        var result = example.Failed()
+			var result = example.Failed()
 				? new TestResultDTO { Outcome = TestOutcome.Failed, StackTrace = GetStackTrace(example.Exception), Message = example.Exception.Message }
 				: new TestResultDTO { Outcome = example.Pending ? TestOutcome.Skipped : TestOutcome.Passed };
 			result.TestName = example.FullName();
@@ -82,23 +81,23 @@ namespace NSpec.TestAdapter
 			this.observer.Receive(result);
 		}
 
-        private string GetStackTrace(Exception exception)
-        {
-            while (exception != null)
-            {
-                var stackTrace = exception.StackTrace;
-                if (! string.IsNullOrEmpty(stackTrace))
-                {
-                    return stackTrace;
-                }
+		private string GetStackTrace(Exception exception)
+		{
+			while (exception != null)
+			{
+				var stackTrace = exception.StackTrace;
+				if (! string.IsNullOrEmpty(stackTrace))
+				{
+					return stackTrace;
+				}
 
-                exception = exception.InnerException;
-            }
+				exception = exception.InnerException;
+			}
 
-            return null;
-        }
+			return null;
+		}
 
-	    public void Write(Context context)
+		public void Write(Context context)
 		{
 		}
 	}
